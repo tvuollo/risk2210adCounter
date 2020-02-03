@@ -1,0 +1,597 @@
+
+<html>
+
+
+<head>
+
+<meta charset="utf-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+
+	<title>Risk 2210 AD Battle Counter</title>
+
+	<style type="text/css">
+
+	input[type="number"] {
+		display: block;
+		font-size: 18px;
+		padding: 10px;
+		width: 100%;
+	}
+
+	input[type="range"] {
+		display: block;
+		width: 100%;
+	}
+
+	select {
+		display: block;
+		font-size: 18px;
+		padding: 10px;
+		width: 100%;
+	}
+
+	tr {
+		padding: 20px 0;
+	}
+
+	td,
+	th {
+		vertical-align: top;
+	}
+
+	hr {
+    background: #c0c0c0;
+    border: 0;
+    height: 1px;
+    margin: 5px 0;
+}
+
+	#meter,
+	#metre {
+		background: #eee;
+		border-radius: 5px;
+		overflow:hidden;
+		clear: both;
+		float: none;
+		height: 15px;
+		margin: 5px 0;
+		positioh: relative;
+		width: 100%;
+	}
+
+	#meter > div,
+	#metre > div {
+		height: 15px;
+		float: left;
+		width: 50%;
+		transition: all 0.75s ease-in-out;
+		-webkit-transition: all 0.75s ease-in-out;
+		-moz-transition: all 0.75s ease-in-out;
+	}
+
+	#meter1,
+	#metre1 {
+		background: #1BBC9B;
+	}
+
+	#meter2,
+	#metre3 {
+		background: #D24D57;
+	}
+
+	#metre2 {
+		background: #F5D76E;
+	}
+
+	@media (max-width:768px) {
+
+		button {
+			font-size: 16px !important;
+			height: auto !important;
+			padding: 5px 0 !important;
+			margin: 10px 0 5px !important;
+			width: 100% !important;
+		}
+
+		body,
+		table,
+		table td {
+			font-size: 13px;
+		}
+
+		h1,h2,h3,h4,h5 {
+			font-size: 15px;
+		}
+
+		td {
+			overflow: hidden;
+		}
+
+		#id3 th, #id3 td {
+    font-size: 10px;
+}
+
+	}
+
+	</style>
+
+	<script type="text/javascript" src="jquery.js"></script>
+
+	<script type="text/javascript">
+
+	var games = 10000;
+	var warcount = 0;
+
+	var attackertotal = 0;
+	var defendertotal = 0;
+
+		var attackerresult = [];
+		var defenderresult = [];
+		var dicerollcount = 0;
+		var attackerlog = [];
+		var defenderlog = [];
+		var resultlog = [];
+		var attackerwins = 0;
+		var defenderwins = 0;
+		var ties = 0;
+		var attackertroopsaverage = 0;
+		var defendertroopsaverage = 0;
+
+
+	// ********* DICEROLL
+	var diceroll = function (dice) {
+		if (dice == null) {
+			dice = 6;
+		}
+		var result = Math.floor((Math.random() * dice) + 1);
+		return result;
+	}
+
+
+	// ********** ATTACKER THROW
+	var attackerthrow = function (dice1, dice2, dice3) {
+		if (dice3 != 0) {
+			attackerresult[2] = diceroll(dice3);
+		}
+		else {
+			attackerresult[2] = 0;
+		}
+		if (dice2 != 0) {
+			attackerresult[1] = diceroll(dice2);
+		}
+		else {
+			attackerresult[1] = 0;
+		}
+		attackerresult[0] = diceroll(dice1);
+		return attackerresult;
+	}
+
+
+	// ********** DEFENDER THROW
+	var defenderthrow = function (dice1, dice2) {
+		if (dice2 != 0) {
+			defenderresult[1] = diceroll(dice2);
+		}
+		else {
+			defenderresult[1] = 0;
+		}
+		defenderresult[0] = diceroll(dice1);
+		return defenderresult;
+	}
+
+
+
+	$(document).ready(function () {
+
+		$('input[type="range"]').each(function () {
+			$(this).closest('td').find('label span').text($(this).val());
+		});
+		$('input[type="range"]').change(function () {
+			$(this).closest('td').find('label span').text($(this).val());
+		});
+
+
+		$('#fight').click(function () {
+
+		$('#id4 table tbody').html();
+
+		warcount = 0;
+
+		attackertotal = 0;
+		defendertotal = 0;
+
+		attackerresult = [];
+		defenderresult = [];
+		dicerollcount = 0;
+		attackerlog = [];
+		defenderlog = [];
+		resultlog = [];
+		attackerwins = 0;
+		defenderwins = 0;
+		ties = 0;
+		attackertroopsaverage = 0;
+		defendertroopsaverage = 0;
+
+		while (warcount < games) {
+
+		attackertroops = $('#inputatttroops').val();
+		defendertroops = $('#inputdeftroops').val();
+		attdice1 = $('#selectattdice1').val();
+		attdice2 = $('#selectattdice2').val();
+		attdice3 = $('#selectattdice3').val();
+		defdice1 = $('#selectdefdice1').val();
+		defdice2 = $('#selectdefdice2').val();
+
+		$('#attackertroops1').text(attackertroops);
+		$('#defendertroops1').text(defendertroops);
+
+		$('#dicerollcount').text('');
+		$('#attackerwins').text('');
+		$('#defenderwins').text('');
+		$('#ties').text('');
+		$('#games').text('');
+		$('#attackertotalwins').text('');
+		$('#defendertotalwins').text('');
+		$('#attackertotalpercentage').text('');
+		$('#defendertotalpercentage').text('');
+
+			warcount++;
+
+		while (attackertroops > 1 && defendertroops >= 0) {
+		
+			var talog = [];
+			var tdlog = [];
+			var trlog = [];
+
+			dicerollcount++;
+
+			if (attackertroops < 4) {
+				attdice3 = 0;
+			}
+			if (attackertroops < 3) {
+				attdice3 = 0;
+				attdice2 = 0;
+			}
+
+			if (defendertroops == 1) {
+				defdice2 = 0;
+			}
+
+			attt = attackerthrow(attdice1,attdice2,attdice3);
+			deft = defenderthrow(defdice1,defdice2);
+
+			talog[dicerollcount] = attt.sort().reverse();
+			tdlog[dicerollcount] = deft.sort().reverse();
+
+			if (tdlog[dicerollcount][1] == 0) {
+				if (talog[dicerollcount][0] <= tdlog[dicerollcount][0] && talog[dicerollcount][1] <= tdlog[dicerollcount][0] && talog[dicerollcount][2] <= tdlog[dicerollcount][0]) {
+					trlog[dicerollcount] = 2;
+					defenderwins++;
+					attackertroops = attackertroops-1;
+				} else {
+					trlog[dicerollcount] = 0;
+					attackerwins++;
+					defendertroops = defendertroops-1;
+				}
+			} else {
+				var comp1 = 0;
+				var comp2 = 0;
+				if (talog[dicerollcount][0] <= tdlog[dicerollcount][0] && talog[dicerollcount][1] <= tdlog[dicerollcount][0] && talog[dicerollcount][2] <= tdlog[dicerollcount][0]) {
+					comp1 = 2;
+				} else {
+					comp1 = 0;
+				}
+				if (talog[dicerollcount][1] <= tdlog[dicerollcount][1] && talog[dicerollcount][2] <= tdlog[dicerollcount][1]) {
+					comp2 = 2;
+				} else {
+					comp2 = 0;
+				}
+				var comp3 = comp1+comp2;
+				if (comp3 == 4) {
+					trlog[dicerollcount] = 2;
+					defenderwins++;
+				 	attackertroops = attackertroops-2;
+				}
+				else if (comp3 == 2) {
+					trlog[dicerollcount] = 1;
+					ties++;
+					attackertroops = attackertroops-1;
+					defendertroops = defendertroops-1;
+				}
+				else {
+					trlog[dicerollcount] = 0;
+					attackerwins++;
+					defendertroops = defendertroops-2;
+				}
+			}
+
+		}
+
+		if (attackertroops < 2) {
+			defendertotal++;
+		} else {
+			attackertotal++;
+		}
+
+		attackertroopsaverage = Number(attackertroopsaverage)+Number(attackertroops);
+	    defendertroopsaverage = Number(defendertroopsaverage)+Number(defendertroops);
+
+
+		} // while warcount
+
+		$('#dicerollcount').text(dicerollcount);
+
+		$('#attackerwins').text(attackerwins + ' ('+Number((attackerwins/dicerollcount*100)).toFixed(2)+'%)');
+		$('#defenderwins').text(defenderwins + ' ('+Number((defenderwins/dicerollcount*100)).toFixed(2)+'%)');
+		$('#ties').text(ties + ' ('+Number((ties/dicerollcount*100)).toFixed(2)+'%)');
+		$('#metre1').css('width', (attackerwins/dicerollcount*100)+'%');
+		$('#metre2').css('width', (defenderwins/dicerollcount*100)+'%');
+		$('#metre3').css('width', (ties/dicerollcount*100)+'%');
+
+		$('#games').text(games);
+		$('#attackertotalwins').text(attackertotal);
+		$('#defendertotalwins').text(defendertotal);
+
+		$('#attackertotalpercentage').text(Number((attackertotal/games*100)).toFixed(2));
+		$('#defendertotalpercentage').text(Number((defendertotal/games*100)).toFixed(2));
+		$('#meter1').css('width', (attackertotal/games*100)+'%');
+		$('#meter2').css('width', (defendertotal/games*100)+'%');
+
+		$('#attackeraveragetroops').text(Number((attackertroopsaverage/games)).toFixed(2));
+		$('#defenderaveragetroops').text(Number((defendertroopsaverage/games)).toFixed(2));
+
+		$('#container').fadeIn();
+
+		}); // fight click
+
+	});
+
+
+
+	</script>
+
+</head>
+
+<body style="margin: 15px;">
+
+	<div style="margin: 0 auto; max-width: 700px;">
+
+		<h1><a href="index.html">Risk 2210 AD Battle Counter</a></h1>
+		<hr>
+
+		<div id="options">
+			<table style="width:100%;">
+				<thead>
+					<th style="text-align:left;">Attacker</th>
+					<th style="text-align:left;">Defender</th>
+				</thead>
+				<tbody>
+					<tr>
+						<td>
+							<select id="selectattdice1">
+								<option value="8" selected>8</option>
+								<option value="6">6</option>
+							</select>
+							<select id="selectattdice2">
+								<option value="8" selected>8</option>
+								<option value="6">6</option>
+								<option value="0">No dice</option>
+							</select>
+							<select id="selectattdice3">
+								<option value="8" selected>8</option>
+								<option value="6">6</option>
+								<option value="0">No dice</option>
+							</select>
+						</td>
+						<td>
+							<select id="selectdefdice1">
+								<option value="8" selected>8</option>
+								<option value="6">6</option>
+							</select>
+							<select id="selectdefdice2">
+								<option value="8" selected>8</option>
+								<option value="6">6</option>
+								<option value="0">No dice</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<label>Troops <span></span></label><br>
+							<select id="inputatttroops">
+								<option value="2">2</option>
+								<option value="3">3</option>
+								<option value="4">4</option>
+								<option value="5" selected>5</option>
+								<option value="6">6</option>
+								<option value="7">7</option>
+								<option value="8">8</option>
+								<option value="9">9</option>
+								<option value="10">10</option>
+								<option value="11">11</option>
+								<option value="12">12</option>
+								<option value="13">13</option>
+								<option value="14">14</option>
+								<option value="15">15</option>
+								<option value="16">16</option>
+								<option value="17">17</option>
+								<option value="18">18</option>
+								<option value="19">19</option>
+								<option value="20">20</option>
+								<option value="21">21</option>
+								<option value="22">22</option>
+								<option value="23">23</option>
+								<option value="24">24</option>
+								<option value="25">25</option>
+								<option value="26">26</option>
+								<option value="27">27</option>
+								<option value="28">28</option>
+								<option value="29">29</option>
+								<option value="30">30</option>
+								<option value="31">31</option>
+								<option value="32">32</option>
+								<option value="33">33</option>
+								<option value="34">34</option>
+								<option value="35">35</option>
+								<option value="36">36</option>
+								<option value="37">37</option>
+								<option value="38">38</option>
+								<option value="39">39</option>
+								<option value="40">40</option>
+							</select>
+						</td>
+						<td>
+							<label>Troops <span></span></label><br>
+							<select id="inputdeftroops">
+								<option value="2">2</option>
+								<option value="3">3</option>
+								<option value="4">4</option>
+								<option value="5" selected>5</option>
+								<option value="6">6</option>
+								<option value="7">7</option>
+								<option value="8">8</option>
+								<option value="9">9</option>
+								<option value="10">10</option>
+								<option value="11">11</option>
+								<option value="12">12</option>
+								<option value="13">13</option>
+								<option value="14">14</option>
+								<option value="15">15</option>
+								<option value="16">16</option>
+								<option value="17">17</option>
+								<option value="18">18</option>
+								<option value="19">19</option>
+								<option value="20">20</option>
+								<option value="21">21</option>
+								<option value="22">22</option>
+								<option value="23">23</option>
+								<option value="24">24</option>
+								<option value="25">25</option>
+								<option value="26">26</option>
+								<option value="27">27</option>
+								<option value="28">28</option>
+								<option value="29">29</option>
+								<option value="30">30</option>
+								<option value="31">31</option>
+								<option value="32">32</option>
+								<option value="33">33</option>
+								<option value="34">34</option>
+								<option value="35">35</option>
+								<option value="36">36</option>
+								<option value="37">37</option>
+								<option value="38">38</option>
+								<option value="39">39</option>
+								<option value="40">40</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2" style="text-align: center;">
+							<button id="fight" style="height: 40px; padding: 0 40px; font-size: 24px; margin: 10px 50px;">FIGHT!!!</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+		</div>
+		<hr>
+
+		<div id="container" style="display:none;">
+		<div id="id2">
+			<table style="width: 100%;">
+				<thead>
+					<tr>
+						<th style="text-align:left;">Attacker wins battle %</th>
+						<th style="text-align:left;">Defender wins battle %</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td style="font-size: 20px !important;" id="attackertotalpercentage"></td>
+						<td style="font-size: 20px !important;" id="defendertotalpercentage"></td>
+					</tr>
+					<tr>
+						<td colspan="2" style="width: 100% !important;">
+							<div id="meter">
+								<div id="meter1"></div>
+								<div id="meter2"></div>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<hr>
+			<table style="width: 100%;">
+				<thead>
+					<tr>
+						<th style="text-align:left;">Number of simulated battles</td>
+						<th style="text-align:left;">Attacker's win count</th>
+						<th style="text-align:left;">Defender's win count</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td id="games"></td>
+						<td id="attackertotalwins"></td>
+						<td id="defendertotalwins"></td>
+					</tr>
+				</tbody>
+			</table>
+			<hr>
+			<table style="width: 100%;">
+				<thead>
+					<tr>
+						<th style="text-align:left;"></td>
+						<th style="text-align:left;">Attacker's average surviving troops</th>
+						<th style="text-align:left;">Defender's average surviving troops</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td id="casualties"></td>
+						<td id="attackeraveragetroops"></td>
+						<td id="defenderaveragetroops"></td>
+					</tr>
+				</tbody>
+			</table>
+
+		</div>
+		<hr>
+		<div id="id3">
+			<table style="width: 100%;">
+				<thead>
+					<tr>
+						<th style="text-align:left;">Dice rounds thrown</th>
+						<th style="text-align:left;">Attacker's dice rounds won</th>
+						<th style="text-align:left;">Defender's dice rounds won</th>
+						<th style="text-align:left;">Tie dice rounds</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td id="dicerollcount"></td>
+						<td id="attackerwins">Attacker's wins</td>
+						<td id="ties">Ties</td>
+						<td id="defenderwins">Defender's wins</td>
+					</tr>
+					<tr>
+						<td colspan="4">
+							<div id="metre">
+								<div id="metre1"></div>
+								<div id="metre2"></div>
+								<div id="metre3"></div>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+	</div>
+
+	</div>
+
+</body>
+
+</html>
